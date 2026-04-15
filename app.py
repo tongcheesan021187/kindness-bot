@@ -5,6 +5,7 @@ st.set_page_config(page_title="CyberKindness Booth", page_icon="💜")
 
 # --- 2. THE CUSTOM SAFETY FILTER ---
 def check_safety(text):
+    # Only heavy vulgarities go here.
     blocked_words = ["insert_extreme_vulgarity_1", "insert_extreme_vulgarity_2"] 
     user_words = text.lower().split()
     for word in user_words:
@@ -13,60 +14,56 @@ def check_safety(text):
             return False
     return True
 
-# --- 3. THE UPDATED BRAIN (With Priority Logic) ---
+# --- 3. THE UPDATED BRAIN (Flexible Scanning) ---
 def get_bot_response(user_input):
     user_input = user_input.lower()
     
-    # PRIORITY 1: Help for Victims (If they ask "what do I do" or "I am being...")
-    if any(word in user_input for word in ["victim", "happening to me", "i am bullied", "i am being", "what do i do"]):
+    # RESPONSE FOR: Being called names (Ugly, Stupid, etc.)
+    # This now checks if ANY of these words appear anywhere in the sentence
+    insults = ["ugly", "stupid", "idiot", "dumb", "noob", "loser", "fat", "weird"]
+    if any(word in user_input for word in insults):
         return (
-            "If this is happening to you, remember: It is NOT your fault. 💜\n\n"
-            "1. **STOP:** Do not reply. Retaliation gives them the reaction they want.\n"
-            "2. **SAVE:** Take screenshots of everything as evidence (messages and profile).\n"
-            "3. **BLOCK:** Use the app settings to block the person immediately.\n"
-            "4. **TELL:** Show the evidence to a teacher, counselor, or parent. "
-            "You can also call TOUCHline at 1800 377 2252 for support."
+            "I'm sorry someone said that to you. It's important to remember: **Don't feed the trolls.** "
+            "Bullies want you to get angry or sad. Try the **Stop, Block, Tell** method:\n\n"
+            "1. **Stop:** Don't reply. \n"
+            "2. **Block:** Use the app settings to block them immediately.\n"
+            "3. **Tell:** Show the messages to a teacher or parent. \n\n"
+            "Their mean words don't change how awesome you are! ✨"
         )
 
-    # PRIORITY 2: Help for Friends (Upstander logic)
+    # RESPONSE FOR: Asking for help/Victim logic
+    if any(word in user_input for word in ["victim", "bullied", "what do i do", "help me"]):
+        return (
+            "If you are facing online meanness, remember: It is NOT your fault. 💜\n\n"
+            "1. **SAVE:** Take screenshots of everything as evidence.\n"
+            "2. **BLOCK:** Block the person immediately so they can't send more.\n"
+            "3. **TELL:** Talk to your Form Teacher, a CCE teacher, or the School Counselor.\n\n"
+            "You can also call **TOUCHline at 1800 377 2252** for support."
+        )
+
+    # RESPONSE FOR: Supporting a friend
     if any(word in user_input for word in ["friend", "support", "upstander"]):
         return (
             "Being an **Upstander** is how we stop cyberbullying! 💜\n\n"
-            "1. **Check-in Privately:** Send a DM saying 'I saw what happened, are you okay?'\n"
-            "2. **Don't Engage:** Don't like or reply to the bully.\n"
-            "3. **Help with Evidence:** Remind your friend to take **screenshots**.\n"
-            "4. **Accompany Them:** Offer to go with them to talk to a teacher.\n"
-            "5. **Be a Buffer:** Change the subject in a toxic group chat."
+            "Check-in privately with your friend, help them take screenshots, and "
+            "offer to walk with them to see a teacher during recess."
         )
 
-    # PRIORITY 3: General Help/Resources
-    if any(word in user_input for word in ["who", "help", "counselor", "teacher"]):
-        return (
-            "You don't have to deal with this alone. **Talk to:**\n\n"
-            "- **In School:** Your Form Teacher, a CCE teacher, or the School Counselor.\n"
-            "- **At Home:** Your parents or an older sibling you trust.\n"
-            "- **Community Helplines:** \n"
-            "  - TOUCHline (Counselling): 1800 377 2252\n"
-            "  - Care Corner Insight: 6353 1180"
-        )
-
-    # PRIORITY 4: Definitions (Only if not asking for help)
+    # RESPONSE FOR: Definitions
     if "cyberbullying" in user_input:
         return (
             "**Cyberbullying** is using digital platforms to repeatedly hurt or harass someone. "
-            "It includes spreading rumors, posting hurtful photos, or excluding others from groups. "
             "If you wouldn't say it to their face, don't type it on a screen! 🚫"
         )
 
     if "cyberkindness" in user_input:
         return (
-            "**Cyberkindness** is about making the internet better! 🌈\n\n"
-            "It means being an Upstander, reporting hurtful content, and sending "
-            "encouraging messages. Small acts of kindness stop a lot of online hate!"
+            "**Cyberkindness** is about making the internet better by being an Upstander "
+            "and sending encouraging messages. 🌈"
         )
 
     # DEFAULT RESPONSE
-    return "That's a great question! At this booth, we're promoting digital safety. How do you think we can help our classmates stay kind in our school chats?"
+    return "That's an important point for our booth! We are advocating for a safer school internet. How do you think we can help our classmates stay kind in our school chats?"
 
 # --- 4. USER INTERFACE ---
 st.title("💜 The CyberKindness Booth")
@@ -74,7 +71,7 @@ st.markdown("### VIA Project: Advocate for Digital Kindness")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Welcome! 💜 Ask me 'What do I do if I'm bullied?' or 'How can I support a friend?'"}
+        {"role": "assistant", "content": "Welcome! 💜 Ask me 'What if someone is mean to me?' or 'How can I support a friend?'"}
     ]
 
 for message in st.session_state.messages:

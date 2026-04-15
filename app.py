@@ -1,19 +1,24 @@
 import streamlit as st
-from better_profanity import profanity
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(page_title="CyberKindness Booth", page_icon="💜")
 
-# --- 2. SAFETY FILTER SETUP ---
-profanity.load_censor_words()
-
+# --- 2. THE CUSTOM SAFETY FILTER ---
+# Instead of an external library, we use our own list for total control.
 def check_safety(text):
+    # 1. These are words that ARE allowed (students can ask about them)
     allowed_words = ["stupid", "ugly", "idiot", "dumb", "noob", "loser", "shut up"]
-    if profanity.contains_profanity(text):
-        user_words = text.lower().split()
-        for word in user_words:
-            if profanity.contains_profanity(word) and word not in allowed_words:
-                return False
+    
+    # 2. These are the ONLY words that will trigger the "Safety Alert"
+    # Add any specific severe vulgarities here that you want to block.
+    blocked_words = ["insert_extreme_vulgarity_1", "insert_extreme_vulgarity_2"] 
+    
+    user_words = text.lower().split()
+    for word in user_words:
+        # Clean the word of punctuation (like "stupid!")
+        clean_word = "".join(char for char in word if char.isalnum())
+        if clean_word in blocked_words:
+            return False
     return True
 
 # --- 3. THE KNOWLEDGE BASE ---

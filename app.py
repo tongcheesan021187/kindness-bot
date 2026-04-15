@@ -5,20 +5,13 @@ from better_profanity import profanity
 st.set_page_config(page_title="CyberKindness Booth", page_icon="💜")
 
 # --- 2. SAFETY FILTER SETUP ---
-# This version is simplified to avoid TypeError
 profanity.load_censor_words()
 
 def check_safety(text):
-    """Checks for vulgarity but ignores school-level insults."""
-    # List of words to ALLOW so students can discuss them
     allowed_words = ["stupid", "ugly", "idiot", "dumb", "noob", "loser", "shut up"]
-    
-    # If the user types a vulgarity, check if it's just one of our 'allowed' words
     if profanity.contains_profanity(text):
-        # If the word is in our allowed list, we let it pass
         user_words = text.lower().split()
         for word in user_words:
-            # If a word is offensive AND not in our allowed list, it's blocked
             if profanity.contains_profanity(word) and word not in allowed_words:
                 return False
     return True
@@ -50,7 +43,6 @@ for message in st.session_state.messages:
 
 # --- 5. CHAT LOGIC ---
 if prompt := st.chat_input("Type here..."):
-    # Run the safety check
     if not check_safety(prompt):
         st.error("🚫 **Safety Alert:** We only use kind language here. Please rephrase your message.")
     else:

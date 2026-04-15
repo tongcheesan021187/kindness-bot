@@ -1,61 +1,54 @@
 import streamlit as st
 from better_profanity import profanity
 
-# --- CONFIGURATION & SAFEGUARDS ---
-st.set_page_config(page_title="CyberKindness Advocate", page_icon="🛡️")
+# --- CONFIGURATION ---
+st.set_page_config(page_title="CyberKindness Helper", page_icon="🤝")
 
-# Custom list of words to block (can be expanded)
-custom_bad_words = ["badword1", "badword2"] 
-profanity.add_censor_words(custom_bad_words)
+# Pre-load profanity filter
+profanity.load_censor_words()
 
 def is_safe(text):
-    """Checks if the input contains vulgarities."""
     return not profanity.contains_profanity(text)
 
-# --- CHATBOT UI ---
-st.title("🛡️ VIA: CyberKindness Advocate")
-st.markdown("""
-Welcome! Use this bot to plan your **CyberKindness** advocacy project. 
-Type your ideas below to get started. 
-*Note: This bot has a strict no-vulgarity policy.*
-""")
+# --- THE BOT'S KNOWLEDGE BASE ---
+# This is where you can add more questions and answers!
+responses = {
+    "cyberbullying": "Cyberbullying is using digital tools (like social media or WhatsApp) to deliberate hurt, upset, or harass someone. It's never okay.",
+    "stupid": "I'm sorry to hear that. Being called names hurts. Remember: their words don't define you. You should take a screenshot and talk to a trusted adult or teacher.",
+    "mean": "If someone is being mean online, the best first step is 'Stop, Block, and Tell'. Don't reply to the meanness, block the user, and tell someone you trust.",
+    "report": "In Singapore, most apps like Instagram and TikTok have 'Report' buttons. You can also talk to your school counselor or a teacher if it's happening in school chats.",
+    "kindness": "Cyberkindness is about being an 'Upstander'—someone who stands up for others and spreads positivity instead of hate!",
+    "sticker": "That's a great idea! Maybe you can design a 'Kindness Sticker' for your VIA project to remind people to think before they post.",
+}
 
-# Initialize chat history
+# --- UI ---
+st.title("🤝 CyberKindness Advocate")
+st.info("I am here to help you deal with online meanness and plan your VIA project. Ask me anything!")
+
 if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Hello! I'm here to help you plan your VIA project. What's the main goal of your cyberkindness campaign?"}
-    ]
+    st.session_state.messages = [{"role": "assistant", "content": "Hi! Type a question like 'What is cyberbullying?' or tell me about something that happened online."}]
 
-# Display chat history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- CHAT LOGIC ---
-if prompt := st.chat_input("Share your project idea..."):
-    
-    # Check for vulgarity
+if prompt := st.chat_input("Type here..."):
     if not is_safe(prompt):
-        st.error("⚠️ Message blocked: Please use kind and appropriate language.")
+        st.error("⚠️ Please use kind language. I cannot respond to vulgarities.")
     else:
-        # Add user message to history
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Generate a response (Simple Logic for VIA planning)
+        # LOGIC: Search for keywords in the user's message
+        user_text = prompt.lower()
+        bot_answer = "That's an interesting point. How do you think we can promote more kindness in our school regarding that?" # Default
+
+        for keyword, reply in responses.items():
+            if keyword in user_text:
+                bot_answer = reply
+                break 
+
         with st.chat_message("assistant"):
-            response = ""
-            lower_prompt = prompt.lower()
-
-            if "instagram" in lower_prompt or "social media" in lower_prompt:
-                response = "Social media is a powerful tool! How will you ensure your posts reach your schoolmates? Maybe a specific hashtag or a poster with a QR code?"
-            elif "workshop" in lower_prompt or "talk" in lower_prompt:
-                response = "An interactive session is great. What's one 'Golden Rule' of the internet you want to teach them?"
-            elif "cyberbullying" in lower_prompt:
-                response = "Addressing bullying is crucial. Your project could focus on how to be an 'Upstander' instead of a 'Bystander'."
-            else:
-                response = "That sounds like a solid start! How can we make this project more engaging for other Secondary 1-5 students?"
-
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            st.markdown(bot_answer)
+            st.session_state.messages.append({"role": "assistant", "content": bot_answer})

@@ -5,10 +5,8 @@ st.set_page_config(page_title="CyberKindness Booth", page_icon="💜")
 
 # --- 2. THE CUSTOM SAFETY FILTER ---
 def check_safety(text):
-    # These are the ONLY words that will trigger the "Safety Alert"
-    # Add any specific severe vulgarities here that you want to block.
+    # Add any specific severe vulgarities here you want to block
     blocked_words = ["insert_vulgarity_1", "insert_vulgarity_2"] 
-    
     user_words = text.lower().split()
     for word in user_words:
         clean_word = "".join(char for char in word if char.isalnum())
@@ -16,41 +14,47 @@ def check_safety(text):
             return False
     return True
 
-# --- 3. THE UPGRADED KNOWLEDGE BASE ---
+# --- 3. THE ADVANCED BRAIN ---
 def get_bot_response(user_input):
     user_input = user_input.lower()
     
-    # Priority 1: Definitions
-    if "what is cyberbullying" in user_input or "define cyberbullying" in user_input:
-        return "Cyberbullying is repeated, mean behavior online using phones or computers. It includes spreading rumors, sending mean messages, or excluding people. It's never okay! 🚫"
-    
-    if "what is cyberkindness" in user_input or "define cyberkindness" in user_input:
-        return "Cyberkindness is treating others online with the same respect you'd show them in person! It means being helpful, encouraging, and positive in comments and chats. 💜"
+    # RESPONSE FOR: "Who do I ask for help?"
+    if any(word in user_input for word in ["who", "help", "bullied", "counselor", "teacher"]):
+        return """
+        If you are being bullied, you are not alone. Here is **who you can talk to right now**:
+        1. **In School:** Your Form Teacher, a CCE teacher, or the School Counselor.
+        2. **At Home:** Your parents or an older sibling you trust.
+        3. **Helplines:** You can call the **Tinkle Friend** (1800 274 4788) or **HELP123** (1800 612 3123).
+        Remember: Reporting is the brave thing to do! 💜
+        """
 
-    # Priority 2: Specific Situations
-    if "stupid" in user_input or "ugly" in user_input or "dumb" in user_input:
-        return "Being called names hurts. Don't reply—that's what the person wants. Instead: 1. Take a screenshot, 2. Block them, and 3. Tell a teacher or parent. You are worth more than their words!"
+    # RESPONSE FOR: "What is Cyberbullying?"
+    if "cyberbullying" in user_input and ("what" in user_input or "define" in user_input):
+        return "Cyberbullying is using digital tools to intentionally hurt or humiliate others. This includes sending mean texts, sharing private photos without permission, or spreading rumors in group chats. It is a serious issue that we can stop together."
 
-    if "whatsapp" in user_input or "group chat" in user_input:
-        return "Chat groups can get toxic. If a chat makes you feel bad, you have the right to mute it or leave. A real friend will understand your need for peace."
+    # RESPONSE FOR: "Someone called me stupid/ugly"
+    if any(word in user_input for word in ["stupid", "ugly", "idiot", "dumb", "noob"]):
+        return "I'm sorry that happened. People often use mean words because they want a reaction. **Don't give it to them.** Screenshot the message, block their account, and tell a trusted adult. Their mean comment says nothing about your true value! ✨"
 
+    # RESPONSE FOR: "What is Cyberkindness?"
+    if "cyberkindness" in user_input:
+        return "Cyberkindness is the 'opposite' of bullying. It's using your keyboard to lift people up! Like defending a friend in a chat, reporting a mean post, or just sending a 'Good Luck' message before an exam. 🌈"
+
+    # RESPONSE FOR: "How to report?"
     if "report" in user_input:
-        return "Reporting is not 'snitching'—it's staying safe. Use the 'Report' button on the app, or show the messages to your school counselor or CCE teacher."
+        return "Most apps (Instagram, TikTok, WhatsApp) have a 'Report' button. Press it! It sends the message to the app developers. For school-related issues, always show the evidence to a teacher so they can help you resolve it safely."
 
-    # Priority 3: General Advice
-    if "help" in user_input or "tips" in user_input:
-        return "I can help with: \n- Defining Cyberbullying \n- What to do if someone is mean \n- How to use the 'Stop, Block, Tell' rule."
-
-    # Default Response if no keywords are found
-    return "That's an interesting point. At our school, we promote being an 'Upstander' (someone who stands up for others). How do you think we can make our school chats Kinder?"
+    # DEFAULT RESPONSE
+    return "That's a good question. At this booth, we're advocating for a safer school internet. Do you think we should have stricter rules for school WhatsApp groups?"
 
 # --- 4. USER INTERFACE ---
 st.title("💜 The CyberKindness Booth")
-st.markdown("Welcome to our VIA Project! Type a question to learn how to keep our digital school space safe.")
+st.markdown("### Real-Time Support & Advocacy")
+st.info("This bot is part of our VIA project. Type your questions below to learn about digital safety.")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Welcome! 💜 Ask me something like 'What is cyberbullying?' or 'What do I do if someone is mean?'"}
+        {"role": "assistant", "content": "Hello! I'm here to help you stay safe online. What's on your mind today?"}
     ]
 
 for message in st.session_state.messages:
@@ -58,15 +62,15 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # --- 5. CHAT LOGIC ---
-if prompt := st.chat_input("Type here..."):
+if prompt := st.chat_input("Ask me about help, definitions, or reporting..."):
     if not check_safety(prompt):
-        st.error("🚫 **Safety Alert:** We only use kind language at this booth. Please rephrase.")
+        st.error("🚫 **Safety Alert:** Please use kind language. We promote respect at this booth.")
     else:
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Get the specific response using our logic function
+        # Generate specific response
         bot_response = get_bot_response(prompt)
         
         with st.chat_message("assistant"):

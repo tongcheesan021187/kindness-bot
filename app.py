@@ -5,6 +5,7 @@ st.set_page_config(page_title="CyberKindness Booth", page_icon="💜")
 
 # --- 2. THE CUSTOM SAFETY FILTER ---
 def check_safety(text):
+    # Only heavy vulgarities go here.
     blocked_words = ["insert_extreme_vulgarity_1", "insert_extreme_vulgarity_2"] 
     user_words = text.lower().split()
     for word in user_words:
@@ -13,64 +14,60 @@ def check_safety(text):
             return False
     return True
 
-# --- 3. THE RE-ORDERED BRAIN ---
+# --- 3. THE "NO-FAIL" BRAIN ---
 def get_bot_response(user_input):
     user_input = user_input.lower()
     
-    # PRIORITY 1: DEFINITIONS (Checking "What is" first)
-    if "what is cyberbullying" in user_input or "define cyberbullying" in user_input:
+    # 1. THE EMERGENCY TRIGGER (Stop, Block, Tell)
+    # This covers "bullies me", "victim", "help", "handle", and all insults.
+    emergency_keywords = ["bully", "bullied", "mean", "victim", "handle", "deal", "what do i do", "ugly", "stupid", "idiot", "dumb", "noob"]
+    if any(word in user_input for word in emergency_keywords):
         return (
-            "**Cyberbullying** is using digital tools (like WhatsApp, TikTok, or Discord) to "
-            "repeatedly and intentionally hurt or harass someone. It includes spreading rumors, "
-            "posting hurtful photos, or excluding others. Remember: If you wouldn't say it to "
-            "their face, don't type it! 🚫"
+            "If someone is being mean to you, remember the **STOP, BLOCK, TELL** method:\n\n"
+            "✋ **STOP:** Do not reply. Don't give them the reaction they want.\n"
+            "🚫 **BLOCK:** Use the app settings to block them immediately.\n"
+            "🗣️ **TELL:** Show the messages to a trusted adult, teacher, or counselor.\n\n"
+            "**Don't forget:** Take a screenshot for evidence before you block! 💜"
+        )
+
+    # 2. DEFINITIONS
+    if "cyberbullying" in user_input:
+        return (
+            "**Cyberbullying** is using digital tools (WhatsApp, TikTok, etc.) to "
+            "repeatedly and intentionally hurt or harass someone. "
+            "If you wouldn't say it to their face, don't type it! 🚫"
         )
     
     if "cyberkindness" in user_input:
         return (
-            "**Cyberkindness** is choosing to be positive online! 🌈 It means being an "
-            "Upstander, reporting meanness, and sending encouraging messages to make "
-            "our school digital space safe for everyone."
+            "**Cyberkindness** is choosing to be an Upstander, reporting meanness, "
+            "and sending encouraging messages to keep our school community safe. 🌈"
         )
 
-    # PRIORITY 2: HANDLING A BULLY / VICTIM ADVICE
-    victim_triggers = ["handle", "deal", "bully", "victim", "mean", "what do i do", "happening to me", "bullied"]
-    insults = ["ugly", "stupid", "idiot", "dumb", "noob", "loser", "weird", "fat"]
-    
-    if any(word in user_input for word in victim_triggers + insults):
+    # 3. HELPLINES
+    if any(word in user_input for word in ["who", "call", "phone", "number", "helpline", "contact"]):
         return (
-            "If someone is being a bully, you have the power to stop the situation. "
-            "Follow the **STOP, BLOCK, TELL** method:\n\n"
-            "✋ **STOP:** Do not reply or argue. Bullies want a reaction.\n"
-            "🚫 **BLOCK:** Use the app settings to block them immediately.\n"
-            "🗣️ **TELL:** Show the messages to a trusted adult, like your teacher or parent.\n\n"
-            "**Important:** Take a screenshot before you block them for evidence! 💜"
-        )
-
-    # PRIORITY 3: WHO TO CALL (Helplines)
-    if any(word in user_input for word in ["who", "call", "phone", "number", "helpline", "contact", "talk to"]):
-        return (
-            "You don't have to deal with this alone. **Talk to these people:**\n\n"
-            "- **In School:** Your Form Teacher, a CCE teacher, or the School Counselor.\n"
-            "- **TOUCHline (Counselling):** 1800 377 2252\n"
+            "You are not alone. **Talk to:**\n"
+            "- **In School:** Your Form Teacher or School Counselor.\n"
+            "- **TOUCHline:** 1800 377 2252\n"
             "- **Care Corner Insight:** 6353 1180"
         )
 
-    # PRIORITY 4: SUPPORTING FRIENDS
+    # 4. SUPPORTING FRIENDS
     if any(word in user_input for word in ["friend", "support", "upstander"]):
         return (
-            "Being an **Upstander** is a superpower! 💜 Check-in privately with your friend, "
-            "help them take screenshots, and offer to walk with them to see a teacher."
+            "Be an **Upstander**! 💜 Check-in privately, help them take screenshots, "
+            "and offer to walk with them to tell a teacher."
         )
 
-    # DEFAULT RESPONSE
-    return "That's an interesting point. At our booth, we believe in being 'Upstanders'. How do you think we can make our school chats Kinder?"
+    # DEFAULT
+    return "That's an important point for our booth! How do you think we can help our classmates stay kind in our school chats?"
 
 # --- 4. USER INTERFACE ---
 st.title("💜 The CyberKindness Booth")
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "Welcome! 💜 Ask me 'What is Cyberbullying?' or 'How do I handle a bully?'"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Welcome! 💜 Ask me 'How do I handle a bully?' or 'What is cyberbullying?'"}]
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):

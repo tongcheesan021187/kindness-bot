@@ -5,6 +5,7 @@ st.set_page_config(page_title="CyberKindness Booth", page_icon="💜")
 
 # --- 2. THE CUSTOM SAFETY FILTER ---
 def check_safety(text):
+    # Only heavy vulgarities go here.
     blocked_words = ["insert_extreme_vulgarity_1", "insert_extreme_vulgarity_2"] 
     user_words = text.lower().split()
     for word in user_words:
@@ -13,46 +14,40 @@ def check_safety(text):
             return False
     return True
 
-# --- 3. THE "PERFECT PRIORITY" BRAIN ---
+# --- 3. THE "SMART PRIORITY" BRAIN ---
 def get_bot_response(user_input):
     user_input = user_input.lower()
     
-    # --- TOPIC 1: ACTS OF CYBERKINDNESS ---
-    # We check for KINDNESS first so it isn't confused with bullying acts.
+    # PRIORITY 1: DEFINITION (The "What is" check)
+    # We check for the specific question before looking at individual keywords.
+    if "what is cyberbullying" in user_input or "define cyberbullying" in user_input:
+        return (
+            "**Cyberbullying** is using digital tools (like WhatsApp, TikTok, or Discord) to "
+            "repeatedly and intentionally hurt or harass someone. It includes spreading rumors, "
+            "posting hurtful photos, or excluding others. \n\n"
+            "**The Golden Rule:** If you wouldn't say it to their face, don't type it! 🚫"
+        )
+
+    # PRIORITY 2: CYBERKINDNESS (Specific check)
     if "cyberkindness" in user_input:
         return (
-            "**Cyberkindness** is all about making the internet a better place! 🌈\n\n"
-            "Some common **acts of cyberkindness** include:\n"
-            "1. **The Private Check-in:** Messaging a friend who was treated meanly to see if they are okay.\n"
-            "2. **Reporting, Not Sharing:** Reporting a hurtful post instead of 'liking' or forwarding it.\n"
-            "3. **Positive Posting:** Leaving encouraging comments on a classmate's work or photo.\n"
-            "4. **Being an Upstander:** Politely speaking up in a group chat when someone is being excluded.\n"
-            "5. **Inclusive Gaming:** Inviting the 'new kid' to join your squad or team chat."
+            "**Cyberkindness** is choosing to be an Upstander, reporting meanness, "
+            "and sending encouraging messages to keep our school community safe. 🌈"
         )
 
-    # --- TOPIC 2: ACTS OF CYBERBULLYING ---
-    if any(word in user_input for word in ["acts", "examples", "types"]) and "bullying" in user_input:
-        return (
-            "Cyberbullying takes many forms. Common **acts** include:\n"
-            "1. **Harassment:** Sending mean or threatening messages repeatedly.\n"
-            "2. **Exclusion:** Intentionally leaving someone out of group chats.\n"
-            "3. **Outing:** Sharing someone's private secrets or photos without permission.\n"
-            "4. **Flaming:** Starting online fights with offensive language.\n"
-            "5. **Impersonation:** Making fake profiles to mock someone."
-        )
-
-    # --- TOPIC 3: EMERGENCY ADVICE (Stop, Block, Tell) ---
+    # PRIORITY 3: EMERGENCY ADVICE (Stop, Block, Tell)
+    # This triggers if they are asking "how" to handle it or use insult keywords.
     emergency_keywords = ["handle", "deal", "victim", "help me", "ugly", "stupid", "idiot", "loser", "bully", "bullied"]
-    if any(word in user_input for word in emergency_keywords):
+    if any(word in user_input for word in emergency_keywords) or user_input.startswith("how"):
         return (
-            "If someone is being mean to you online, follow **STOP, BLOCK, TELL**:\n\n"
+            "If someone is being mean to you online, follow the **STOP, BLOCK, TELL** method:\n\n"
             "✋ **STOP:** Do not reply. Don't give them a reaction.\n"
             "🚫 **BLOCK:** Use app settings to block them immediately.\n"
             "🗣️ **TELL:** Show the messages to a trusted adult, teacher, or counselor.\n\n"
             "**Pro-tip:** Take a screenshot for evidence first! 💜"
         )
 
-    # --- TOPIC 4: CONTACTS & HELPLINES ---
+    # PRIORITY 4: HELPLINES
     if any(word in user_input for word in ["who", "call", "phone", "number", "helpline", "contact"]):
         return (
             "You don't have to deal with this alone. **Talk to:**\n"
@@ -61,28 +56,21 @@ def get_bot_response(user_input):
             "- **Care Corner Insight:** 6353 1180 📞"
         )
 
-    # --- TOPIC 5: DEFINITIONS ---
-    if "what is cyberbullying" in user_input:
-        return (
-            "**Cyberbullying** is using digital tools to repeatedly and intentionally hurt others. "
-            "Remember: If you wouldn't say it to their face, don't type it! 🚫"
-        )
-
-    # DEFAULT
+    # DEFAULT RESPONSE
     return "That's an important point for our booth! How do you think we can help our classmates stay kind in our school chats?"
 
 # --- 4. USER INTERFACE ---
 st.title("💜 The CyberKindness Booth")
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "Welcome! 💜 Ask me 'What are some acts of cyberkindness?' or 'Who can I call for help?'"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Welcome! 💜 Ask me 'What is Cyberbullying?' or 'How do I handle a bully?'"}]
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
 # --- 5. CHAT LOGIC ---
-if prompt := st.chat_input("Ask about kindness, acts, or help..."):
+if prompt := st.chat_input("Ask about kindness, help, or definitions..."):
     if not check_safety(prompt):
         st.error("🚫 **Safety Alert:** Please use respectful language.")
     else:
